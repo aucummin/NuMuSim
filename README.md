@@ -4,7 +4,7 @@
 # Documentation  #
 ##################
 
-The underlying principle of this code, as well as some studies, are documented in https://arxiv.org/abs/1707.00334  and https://journals.aps.org/prd/abstract/10.1103/PhysRevD.97.023021 . If you used this code for a publication, please cite the corresponding paper https://journals.aps.org/prd/abstract/10.1103/PhysRevD.97.023021 . A bug fix ( https://github.com/harmscho/NuTauSim/commit/ddacd1aeebab7cdfa6c155464b79d549e8b9b02e ) lead to an erratum which corresponds to the current version of the this code. The erratum you can find here https://journals.aps.org/prd/abstract/10.1103/PhysRevD.99.069902 
+This code modifies the existing NuTauSim Monte Carlo propagation code to account for the propagation of muon neutrinos through the Earth and the subsequent production of emerging muons. The underlying principle of this code, as well as some studies, are documented in https://arxiv.org/abs/1707.00334  and https://journals.aps.org/prd/abstract/10.1103/PhysRevD.97.023021 . If you used this code for a publication, please cite the corresponding paper https://journals.aps.org/prd/abstract/10.1103/PhysRevD.97.023021 . A bug fix ( https://github.com/harmscho/NuTauSim/commit/ddacd1aeebab7cdfa6c155464b79d549e8b9b02e ) lead to an erratum which corresponds to the current version of the this code. The erratum you can find here https://journals.aps.org/prd/abstract/10.1103/PhysRevD.99.069902 
 
 If you want to contribute to this project, please use the forking workflow as explained in:
 
