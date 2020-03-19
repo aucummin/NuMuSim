@@ -881,25 +881,33 @@ double beta9fit(double *x, int *par, int ELOSSmode)
   double b0 = 0.;
   double b1 = 0.;
   double b2 = 0.;
-  
-  /* ALLM NOT WORKING YET*/
+  double b3 = 0,;
+	
+	/* BB */
+	/* Bezrukov and Bugaev Model for photonuclear losses*/
+	/* L. B. Bezrukov and E. V. Bugaev, Sov. J. Nucl. Phys. 33, 635 (1981). */
   if(ELOSSmode==0)
   {
-  b0 = -7.78527765e+00;
-  b1 = -2.80672147e-02;  
-  b2 = 6.38891661e-03;
-  printf("ALLM \n");
+  b0 = 5.83851872e-7;
+  b1 = 1.43409388e-6;  
+  b2 = -1.68422871e-7;
+	b3 = 7.00799338e-9;
+  //printf("BB \n");
   }
 
+  	/* ALLM */
+	/* ALLM Model for photonuclear losses*/
+	/* S. Dutta, M. H. Reno, I. Sarcevic, D. Seckel Phys.Rev. D63 (2001) 094020 */
   if(ELOSSmode==1)
   {
-  b0=-7.03781575e-06;
-  b1=9.15795430e-06;
-  b2=0.137293545;
-  printf("BB \n");
+  b0 = 9.34342970e-8;
+  b1 = 2.00377195e-6;  
+  b2 = -3.23502813e-7;
+	b3 = 1.88550639e-8;
+  //printf("ALLM \n");
   }
   double log10E = log10(x[0]);
-  f = b0+b1*pow(log10E,b2)
+  f = b0+b1*log10E+b2*log10E*log10E+b3*log10E*log10E*log10E
 
 	return f;
 }
