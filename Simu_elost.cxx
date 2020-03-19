@@ -881,7 +881,7 @@ double beta9fit(double *x, int *par, int ELOSSmode)
   double b0 = 0.;
   double b1 = 0.;
   double b2 = 0.;
-  double b3 = 0,;
+  double b3 = 0.;
 	
 	/* BB */
 	/* Bezrukov and Bugaev Model for photonuclear losses*/
@@ -907,7 +907,7 @@ double beta9fit(double *x, int *par, int ELOSSmode)
   //printf("ALLM \n");
   }
   double log10E = log10(x[0]);
-  f = b0+b1*log10E+b2*log10E*log10E+b3*log10E*log10E*log10E
+  f = b0+b1*log10E+b2*log10E*log10E+b3*log10E*log10E*log10E;
 
 	return f;
 }
