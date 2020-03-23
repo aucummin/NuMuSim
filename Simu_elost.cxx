@@ -644,12 +644,12 @@ double dsigCC(double E, int CCmode)
 
   double f=0.;
   double p[4];
-	// Connolly+, 2011 middle model (ARW's parametrization)
+  // Connolly+, 2011 middle model (ARW's parametrization)
   double p0[4] = { -5.35400180e+01,   2.65901551e+00, -1.14017685e-01,   1.82495442e-03};
-	// Gandhi, Quigg, Reno 1995 Neutrino cross section
-	double p1[4] = { -6.24043607e+01,   4.21769574e+00, -2.06814586e-01,   3.70730061e-03};
-	// Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
-	double p2[4] = { -6.43574494e+01,   4.41740442e+00, -2.10856220-01,   3.65724741e-03};
+  // Gandhi, Quigg, Reno 1995 Neutrino cross section
+  double p1[4] = { -6.24043607e+01,   4.21769574e+00, -2.06814586e-01,   3.70730061e-03};
+  // Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
+  double p2[4] = { -6.43574494e+01,   4.41740442e+00, -2.10856220-01,   3.65724741e-03};
 
   double log10_E_eV = log10(E)+9.;
   for (int ii = 0 ; ii<4; ii++){
@@ -675,11 +675,11 @@ double dsigNC(double E, int CCmode)
 {
   double f=0.;
   double p[4];
-	// Connolly+, 2011 middle model (ARW's parametrization)
+  // Connolly+, 2011 middle model (ARW's parametrization)
   double p0[4] = { -5.41463399e+01,   2.65465169e+00,  -1.11848922e-01,   1.75469643e-03};
-	// Gandhi, Quigg, Reno 1995 Neutrino cross section
+  // Gandhi, Quigg, Reno 1995 Neutrino cross section
   double p1[4] = { -6.33753554e+01,   4.26790713e+00,  -2.07426844e-01,   3.68501726e-03};
-	// Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
+  // Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
   double p2[4] = { -6.33697437e+01,   4.11592385e+00,  -1.90600183e-01,   3.22478095e-03};
 
   double log10_E_eV = log10(E)+9.;
