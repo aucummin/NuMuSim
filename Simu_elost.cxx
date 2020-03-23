@@ -172,7 +172,7 @@ int main(int argc, char **argv)
     cout << "Will throw uniformly random muon neutrinos energy between log10(E_nu/eV) = 15 and  log21(E_nu/eV)" << endl;
   }
   // The finalstate array gets filled by sampling of MuonData
-  double finalstate[6];      // 0=nu_mu, 1=nu_mu, 2=nu_e, 3=hadron, 4=muon, 5=electron
+  double finalstate[6];      // 0=nu_mu for tracking muon regeneration
   
   // Initialize Random number generator.
   struct timeval time_struct;
