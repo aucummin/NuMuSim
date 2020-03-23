@@ -44,7 +44,7 @@ using namespace std;
 double funcalph(double *x, int *par);
 double delta(double X);
 // Parameterisations for beta 
-double beta9fit(double *x, int *par, int ELOSSmode);	
+double beta9fit(double *x, double *par, int ELOSSmode);	
 // Elost by muon dE/dX in GeV/(g/cm^2)
 double elost(double E, double dens, int ELOSSmode);
 
@@ -641,80 +641,30 @@ int main(int argc, char **argv)
 // ########################################################
 double dsigCC(double E, int CCmode)
 {
+
   double f=0.;
-  
-  // 	double l1=log10(E);
-  // 	double l2=l1*l1;
-  // 	double l3=l2*l1;
-  // 	double l4=l3*l1;
-  // 	double l5=l4*l1;
-  // 	double l6=l5*l1;
-  // 	double l7=l6*l1;
-  // 	f=pCC0+pCC1*l1+pCC2*l2+pCC3*l3+pCC4*l4+pCC5*l5+pCC6*l6+pCC7*l7;
-  
-  //      f = 6.37994*pow(E,0.355991)*1e-36;
-  
-  /* CKMT */
-  //      f = (-36.3345965603+7.14693605311*pow(E,0.293313250614))*1.e-36;
-  
-  /* ALLM */
-  // H. Abramowicz et al., Phys. Lett. B 269, 465 (1991);
-  // H. Abramowicz and A. Levy, hep-ph/9712415.
-  //	f = (-280.544665122+10.3452620208*pow(E,0.317119535055))*1.e-36;
-  
-  /* ASW */   // Saturation of pdfs
-              // N. Armesto et al., Phys. Rev. D 77, 013001 (2008).
-              // N. Armesto et al., Phys. Rev. Lett. 94, 022002 (2005).
-              //      f = (-799.252409182+52.4932827684*pow(E,0.244551044541))*1.e-36;
-  
-  /* Sarkar */  // Default model used in Auger
-                // A. Cooper-Sarkar and S. Sarkar, JHEP 0801, 075 (2008).
-                // Amanda Cooper-Sarkar, Philipp Mertsch, Subir Sarkar. JHEP 08, 042 (2011).
-                //      f = (-649.265343982+26.4437052803*pow(E,0.296160447336))*1.e-36;
-  
-  // Sarkar model (Yann's parametrization)
-  //    double AS=-0.391641;
-  //    double BS=0.635232;
-  //    double CS=-0.0158144;
-  //    f= (pow(10,AS+BS*log10(E)+CS*pow(log10(E),2)))*1.e-36;
-  
+  double p[4];
+	// Connolly+, 2011 middle model (ARW's parametrization)
+  double p0[4] = { -5.35400180e+01,   2.65901551e+00, -1.14017685e-01,   1.82495442e-03};
+	// Gandhi, Quigg, Reno 1995 Neutrino cross section
+	double p1[4] = { -6.24043607e+01,   4.21769574e+00, -2.06814586e-01,   3.70730061e-03};
+	// Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
+	double p2[4] = { -6.43574494e+01,   4.41740442e+00, -2.10856220-01,   3.65724741e-03};
+
+  double log10_E_eV = log10(E)+9.;
+  for (int ii = 0 ; ii<4; ii++){
   if(CCmode==0){
-    // Connolly+, 2011 middle model (ARW's parametrization)
-    double p[4] = { -5.35400180e+01,   2.65901551e+00, -1.14017685e-01,   1.82495442e-03};
-    double log10_E_eV = log10(E)+9.; // E is in GeV, this parameterization is in log_10 ( E / eV ).
-    for (int ii = 0 ; ii<4; ii++){
-      f += p[ii]*pow(log10_E_eV,ii);
-      //printf("\t %1.2e %1.2f %1.2e %1.2e %1.2e \n", E, log10_E_eV, p[ii], pow(log10_E_eV,ii), f);
-    }
-    f = pow(10,f);
-    // printf("CC middle %1.2e %1.2f %1.2e %1.2f\n", E, log10_E_eV, f, log10(f));
+	p[ii] = p0[ii];
   }
-  
   if(CCmode==1){
-    // Connolly+, 2011 lower model (ARW's parametrization)
-    double p[4] = {-4.26355014e+01,   4.89151126e-01,   2.94975025e-02,  -1.32969832e-03};
-    double log10_E_eV = log10(E)+9.; // E is in GeV, this parameterization is in log_10 ( E / eV ).
-    for (int ii = 0 ; ii<4; ii++){
-      f += p[ii]*pow(log10_E_eV,ii);
-      //printf("\t %1.2e %1.2f %1.2e %1.2e %1.2e \n", E, log10_E_eV, p[ii], pow(log10_E_eV,ii), f);
-    }
-    f = pow(10,f);
-    // printf("CC lower %1.2e %1.2f %1.2e %1.2f\n", E, log10_E_eV, f, log10(f));
+	p[ii] = p1[ii];
   }
-  
-  
   if(CCmode==2){
-    // Connolly+, 2011 upper model (ARW's parametrization)
-    double p[4] = {-5.31078363e+01,   2.72995742e+00,  -1.28808188e-01,   2.36800261e-03};
-    double log10_E_eV = log10(E)+9.; // E is in GeV, this parameterization is in log_10 ( E / eV ).
-    for (int ii = 0 ; ii<4; ii++){
-      f += p[ii]*pow(log10_E_eV,ii);
-      //printf("\t %1.2e %1.2f %1.2e %1.2e %1.2e \n", E, log10_E_eV, p[ii], pow(log10_E_eV,ii), f);
-    }
-    f = pow(10,f);
-    // printf("CC upper %1.2e %1.2f %1.2e %1.2f\n", E, log10_E_eV, f, log10(f));
+	p[ii] = p2[ii];
   }
-  
+    f += p[ii]*pow(log10_E_eV,ii);
+  }
+  f = pow(10,f);
   return f;
 }
 
@@ -724,62 +674,29 @@ double dsigCC(double E, int CCmode)
 double dsigNC(double E, int CCmode)
 {
   double f=0.;
-  
-  // 	double l1=log10(E);
-  // 	double l2=l1*l1;
-  // 	double l3=l2*l1;
-  // 	double l4=l3*l1;
-  // 	double l5=l4*l1;
-  // 	double l6=l5*l1;
-  // 	double l7=l6*l1;
-  // 	double l8=l7*l1;
-  // 	double l9=l8*l1;
-  // 	f = pNC0+pNC1*l1+pNC2*l2+pNC3*l3+pNC4*l4+pNC5*l5+pNC6*l6+pNC7*l7+pNC8*l8+pNC9*l9;
-  
-  //      f = 5.00969*pow(E,0.34944)*1e-36;
-  
-  // See references of models in dsigCC
-  //      f = (-36.3345965603+7.14693605311*pow(E,0.293313250614))/2.4*1.e-36; // CKMT
-  //	f = (-280.544665122+10.3452620208*pow(E,0.317119535055))/2.4*1.e-36; // ALLM
-  //      f = (-799.252409182+52.4932827684*pow(E,0.244551044541))/2.4*1.e-36; // ASW
-  // f = (-259.30822396+9.31732621406*pow(E,0.302056103343))*1.e-36;      // Sarkar
-  
+  double p[4];
+	// Connolly+, 2011 middle model (ARW's parametrization)
+  double p0[4] = { -5.41463399e+01,   2.65465169e+00,  -1.11848922e-01,   1.75469643e-03};
+	// Gandhi, Quigg, Reno 1995 Neutrino cross section
+  double p1[4] = { -6.33753554e+01,   4.26790713e+00,  -2.07426844e-01,   3.68501726e-03};
+	// Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
+  double p2[4] = { -6.33697437e+01,   4.11592385e+00,  -1.90600183e-01,   3.22478095e-03};
+
+  double log10_E_eV = log10(E)+9.;
+  for (int ii = 0 ; ii<4; ii++){
   if(CCmode==0){
-    // Connolly+, 2011 middle model (ARW's parametrization)
-    double p[4] = { -5.41463399e+01,   2.65465169e+00,  -1.11848922e-01,   1.75469643e-03};
-    double log10_E_eV = log10(E)+9.; // E is in GeV, this parameterization is in log_10 ( E / eV ).
-    for (int ii = 0 ; ii<4; ii++){
-      f += p[ii]*pow(log10_E_eV,ii);
-      //printf("\t %1.2e %1.2f %1.2e %1.2e %1.2e \n", E, log10_E_eV, p[ii], pow(log10_E_eV,ii), f);
-    }
-    f = pow(10,f);
-    // printf("NC middle %1.2e %1.2f %1.2e %1.2f\n", E, log10_E_eV, f, log10(f));
+	p[ii] = p0[ii];
   }
-  
   if(CCmode==1){
-    // Connolly+, 2011 lower model (ARW's parametrization)
-    double p[4] = {-4.42377028e+01, 7.07758518e-01, 1.55925146e-02, -1.02484763e-03};
-    double log10_E_eV = log10(E)+9.; // E is in GeV, this parameterization is in log_10 ( E / eV ).
-    for (int ii = 0 ; ii<4; ii++){
-      f += p[ii]*pow(log10_E_eV,ii);
-      //printf("\t %1.2e %1.2f %1.2e %1.2e %1.2e \n", E, log10_E_eV, p[ii], pow(log10_E_eV,ii), f);
-    }
-    f = pow(10,f);
-    // printf("NC lower %1.2e %1.2f %1.2e %1.2f\n", E, log10_E_eV, f, log10(f));
+	p[ii] = p1[ii];
   }
-  
-  
   if(CCmode==2){
-    // Connolly+, 2011 upper model (ARW's parametrization)
-    double p[4] = {-5.36713302e+01,   2.72528813e+00,  -1.27067769e-01,   2.31235293e-03};
-    double log10_E_eV = log10(E)+9.; // E is in GeV, this parameterization is in log_10 ( E / eV ).
-    for (int ii = 0 ; ii<4; ii++){
-      f += p[ii]*pow(log10_E_eV,ii);
-      //printf("\t %1.2e %1.2f %1.2e %1.2e %1.2e \n", E, log10_E_eV, p[ii], pow(log10_E_eV,ii), f);
-    }
-    f = pow(10,f);
-    // printf("NC upper %1.2e %1.2f %1.2e %1.2f\n", E, log10_E_eV, f, log10(f));
+	p[ii] = p2[ii];
   }
+    f += p[ii]*pow(log10_E_eV,ii);
+  }
+
+  f = pow(10,f);
   return f;
 }
 
@@ -788,6 +705,7 @@ double dsigNC(double E, int CCmode)
 // ###################################################
 double dPdesdx(double E)
 {
+
   double f;
   
   f=m/(E*muondl);
@@ -875,41 +793,65 @@ double delta(double X)
 // ###################################################
 //mac double beta9fit(double *x, double *par)
 //double beta9fit(double *x)
-double beta9fit(double *x, int *par, int ELOSSmode)
+double beta9fit(double *x, double *par, int ELOSSmode)
 {
+  /*Energy loss parameters here are the sum ofbremmstrahlung, pair production, and photonuclear interactions*/
+  /*Photonuclear losses are characterized using the 2 models below*/
   double f=0.;
   double b0 = 0.;
   double b1 = 0.;
   double b2 = 0.;
   double b3 = 0.;
 	
-	/* BB */
-	/* Bezrukov and Bugaev Model for photonuclear losses*/
-	/* L. B. Bezrukov and E. V. Bugaev, Sov. J. Nucl. Phys. 33, 635 (1981). */
+  /* BB */
+  /* Bezrukov and Bugaev Model for photonuclear losses*/
+  /* L. B. Bezrukov and E. V. Bugaev, Sov. J. Nucl. Phys. 33, 635 (1981). */
   if(ELOSSmode==0)
   {
+  //Rock
   b0 = 5.83851872e-7;
   b1 = 1.43409388e-6;  
   b2 = -1.68422871e-7;
-	b3 = 7.00799338e-9;
+  b3 = 7.00799338e-9;
+  //Water
+  //b0 = 5.12670536e-7;
+  //b1 = 9.99530111e-7;
+  //b2 = -1.11323428e-7;
+  //b3 = 4.72861872e-9;
+  //Iron
+  //b0 = 8.75977776e-7;
+  //b1 = 2.93625853e-6;
+  //b2 = -3.62823734e-7;
+  //b3 = 1.47776050e-8;
   //printf("BB \n");
   }
 
-  	/* ALLM */
-	/* ALLM Model for photonuclear losses*/
-	/* S. Dutta, M. H. Reno, I. Sarcevic, D. Seckel Phys.Rev. D63 (2001) 094020 */
+  /* ALLM */
+  /* ALLM Model for photonuclear losses*/
+  /* S. Dutta, M. H. Reno, I. Sarcevic, D. Seckel Phys.Rev. D63 (2001) 094020 */
   if(ELOSSmode==1)
   {
+  //Rock
   b0 = 9.34342970e-8;
   b1 = 2.00377195e-6;  
   b2 = -3.23502813e-7;
-	b3 = 1.88550639e-8;
+  b3 = 1.88550639e-8;
+  //Water
+  //b0 = -2.28339315e-8;
+  //b1 = 1.62120188e-6;
+  //b2 = -2.79190159e-7;
+  //b3 = 1.74777231e-8;
+  //Iron
+  //b0 = 4.52433708e-7;
+  //b1 = 3.43437339e-6;
+  //b2 = -5.00105774e-7;
+  //b3 = 2.53501171e-8;
   //printf("ALLM \n");
   }
   double log10E = log10(x[0]);
   f = b0+b1*log10E+b2*log10E*log10E+b3*log10E*log10E*log10E;
 
-	return f;
+  return f;
 }
 
 // #######################################################
