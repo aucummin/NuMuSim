@@ -719,7 +719,7 @@ double dPdesdx(double E)
 double elost(double E, double dens, int ELOSSmode)
 {
   double f;
-  
+  double z = 0.;
   //  dE/dX =      E*beta(E)      +     alpha(E)
   
   // this is a super-kludgy way to account for beta being different for iron <A>=56.84, <Z>=26; rock <A>=22, <Z>=11; and water <A>=11.9, <Z>=6.6
