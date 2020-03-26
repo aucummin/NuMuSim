@@ -641,29 +641,40 @@ int main(int argc, char **argv)
 // ########################################################
 double dsigCC(double E, int CCmode)
 {
-
   double f=0.;
   double p[4];
+  // Connolly+, 2011 lower model (ARW's parametrization)
+  double p0[4] = {-4.26355014e+01,   4.89151126e-01,   2.94975025e-02,  -1.32969832e-03};
   // Connolly+, 2011 middle model (ARW's parametrization)
-  double p0[4] = { -5.35400180e+01,   2.65901551e+00, -1.14017685e-01,   1.82495442e-03};
+  double p1[4] = { -5.35400180e+01,   2.65901551e+00, -1.14017685e-01,   1.82495442e-03};
+  // Connolly+, 2011 upper model (ARW's parametrization)
+  double p2[4] = {-5.31078363e+01,   2.72995742e+00,  -1.28808188e-01,   2.36800261e-03};
+
   // Gandhi, Quigg, Reno 1995 Neutrino cross section
-  double p1[4] = { -6.24043607e+01,   4.21769574e+00, -2.06814586e-01,   3.70730061e-03};
+  double p3[4] = { -6.24043607e+01,   4.21769574e+00, -2.06814586e-01,   3.70730061e-03};
   // Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
-  double p2[4] = { -6.43574494e+01,   4.41740442e+00, -2.10856220-01,   3.65724741e-03};
+  double p4[4] = { -6.43574494e+01,   4.41740442e+00, -2.10856220-01,   3.65724741e-03};
 
   double log10_E_eV = log10(E)+9.;
   for (int ii = 0 ; ii<4; ii++){
   if(CCmode==0){
-	p[ii] = p0[ii];
+  p[ii] = p0[ii];
   }
   if(CCmode==1){
-	p[ii] = p1[ii];
+  p[ii] = p1[ii];
   }
   if(CCmode==2){
-	p[ii] = p2[ii];
+  p[ii] = p2[ii];
+  }
+  if(CCmode==3){
+  p[ii] = p3[ii];
+  }
+  if(CCmode==4){
+  p[ii] = p4[ii];
   }
     f += p[ii]*pow(log10_E_eV,ii);
   }
+
   f = pow(10,f);
   return f;
 }
@@ -675,23 +686,34 @@ double dsigNC(double E, int CCmode)
 {
   double f=0.;
   double p[4];
+  // Connolly+, 2011 lower model (ARW's parametrization)
+  double p0[4] = {-4.42377028e+01, 7.07758518e-01, 1.55925146e-02, -1.02484763e-03};
   // Connolly+, 2011 middle model (ARW's parametrization)
-  double p0[4] = { -5.41463399e+01,   2.65465169e+00,  -1.11848922e-01,   1.75469643e-03};
+  double p1[4] = { -5.41463399e+01,   2.65465169e+00,  -1.11848922e-01,   1.75469643e-03};
+  // Connolly+, 2011 upper model (ARW's parametrization)
+  double p2[4] = {-5.36713302e+01,   2.72528813e+00,  -1.27067769e-01,   2.31235293e-03};
+	
   // Gandhi, Quigg, Reno 1995 Neutrino cross section
-  double p1[4] = { -6.33753554e+01,   4.26790713e+00,  -2.07426844e-01,   3.68501726e-03};
+  double p3[4] = { -6.33753554e+01,   4.26790713e+00,  -2.07426844e-01,   3.68501726e-03};
   // Gandhi, Quigg, Reno 1995 Anti-Neutrino cross section
-  double p2[4] = { -6.33697437e+01,   4.11592385e+00,  -1.90600183e-01,   3.22478095e-03};
+  double p4[4] = { -6.33697437e+01,   4.11592385e+00,  -1.90600183e-01,   3.22478095e-03};
 
   double log10_E_eV = log10(E)+9.;
   for (int ii = 0 ; ii<4; ii++){
   if(CCmode==0){
-	p[ii] = p0[ii];
+  p[ii] = p0[ii];
   }
   if(CCmode==1){
-	p[ii] = p1[ii];
+  p[ii] = p1[ii];
   }
   if(CCmode==2){
-	p[ii] = p2[ii];
+  p[ii] = p2[ii];
+  }
+  if(CCmode==3){
+  p[ii] = p3[ii];
+  }
+  if(CCmode==4){
+  p[ii] = p4[ii];
   }
     f += p[ii]*pow(log10_E_eV,ii);
   }
