@@ -44,7 +44,7 @@ using namespace std;
 double funcalph(double *x, int *par);
 double delta(double X);
 // Parameterisations for beta 
-double beta9fit(double *x, double *par, int ELOSSmode);	
+double beta9fit(double *x, int *par, int ELOSSmode);	
 // Elost by muon dE/dX in GeV/(g/cm^2)
 double elost(double E, double dens, int ELOSSmode);
 
@@ -741,15 +741,17 @@ double dPdesdx(double E)
 double elost(double E, double dens, int ELOSSmode)
 {
   double f;
-  double z = 0.;
+  //double z = 0.;
   //  dE/dX =      E*beta(E)      +     alpha(E)
   
   // this is a super-kludgy way to account for beta being different for iron <A>=56.84, <Z>=26; rock <A>=22, <Z>=11; and water <A>=11.9, <Z>=6.6
   // material properties are not tracked in this simulation but densities are.
 
-  //int lyr = 0; // initialize to iron
-  //if (dens < 7.75) lyr = 1; // density jump between outer core and mantle
-  //if (dens < 2.0) lyr = 2;  // density jump between rock and water 
+  int lyr = 0; // initialize to iron
+  if (dens < 7.75) lyr = 1; // density jump between outer core and mantle
+  if (dens < 2.0) lyr = 2;  // density jump between rock and water 
+
+  double factor[3] = {0.9304, 1.0, 1.1092}; // ratio Z/A for iron, rock, and water divided by Z/A=0.5 for rock   
 
   // The correction below was based on the claim that the photonuclear energy loss is proportional to <A> as well as the density in Palomares-Ruiz, Irimia, & Weiler, Phys. Rev. D, 73, 083003 (2006)
   // Searching through the references, this claim is demonstrably false. See S. I. Dutta, M. H. Reno, I. Sarcevic, and D. Seckel, Phys. Rev. D 63, 094020 (2001).
@@ -758,7 +760,7 @@ double elost(double E, double dens, int ELOSSmode)
   //printf("factor %1.2f \n", factor);
   
   //f = E * beta9fit(&E,&lyr,ELOSSmode) + funcalph(&E, &lyr);
-  f = 2e-3 + E * beta9fit(&E,&z,ELOSSmode);
+  f = 2e-3*factor[lyr] + E * beta9fit(&E,&lyr,ELOSSmode);
 	
 	//f = E*(emlost->Eval(E)) + funca->Eval(E);
   // cout << "\tE " << E << endl;
@@ -815,7 +817,7 @@ double delta(double X)
 // ###################################################
 //mac double beta9fit(double *x, double *par)
 //double beta9fit(double *x)
-double beta9fit(double *x, double *par, int ELOSSmode)
+double beta9fit(double *x, int *par, int ELOSSmode)
 {
   /*Energy loss parameters here are the sum ofbremmstrahlung, pair production, and photonuclear interactions*/
   /*Photonuclear losses are characterized using the 2 models below*/
@@ -824,51 +826,65 @@ double beta9fit(double *x, double *par, int ELOSSmode)
   double b1 = 0.;
   double b2 = 0.;
   double b3 = 0.;
+
+  int lyr = par[0];
 	
   /* BB */
   /* Bezrukov and Bugaev Model for photonuclear losses*/
   /* L. B. Bezrukov and E. V. Bugaev, Sov. J. Nucl. Phys. 33, 635 (1981). */
-  if(ELOSSmode==0)
+  if(ELOSSmode==1)
   {
-  //Rock
-  b0 = 5.83851872e-7;
-  b1 = 1.43409388e-6;  
-  b2 = -1.68422871e-7;
-  b3 = 7.00799338e-9;
-  //Water
-  //b0 = 5.12670536e-7;
-  //b1 = 9.99530111e-7;
-  //b2 = -1.11323428e-7;
-  //b3 = 4.72861872e-9;
-  //Iron
-  //b0 = 8.75977776e-7;
-  //b1 = 2.93625853e-6;
-  //b2 = -3.62823734e-7;
-  //b3 = 1.47776050e-8;
-  //printf("BB \n");
+    if (lyr==1){//Rock
+      b0 = 5.83851872e-7;
+      b1 = 1.43409388e-6;  
+      b2 = -1.68422871e-7;
+      b3 = 7.00799338e-9;
+      //printf("Rock \n");
+      }  
+  if(lyr==2){//Water
+      b0 = 5.12670536e-7;
+      b1 = 9.99530111e-7;
+      b2 = -1.11323428e-7;
+      b3 = 4.72861872e-9;
+      //printf("Water \n");
+      }    
+  if(lyr==0){//Iron
+      b0 = 8.75977776e-7;
+      b1 = 2.93625853e-6;
+      b2 = -3.62823734e-7;
+      b3 = 1.47776050e-8;
+      //printf("Iron \n");
+    }
+    //printf("BB \n");
   }
 
   /* ALLM */
   /* ALLM Model for photonuclear losses*/
   /* S. Dutta, M. H. Reno, I. Sarcevic, D. Seckel Phys.Rev. D63 (2001) 094020 */
-  if(ELOSSmode==1)
+  if(ELOSSmode==0)
   {
-  //Rock
-  b0 = 9.34342970e-8;
-  b1 = 2.00377195e-6;  
-  b2 = -3.23502813e-7;
-  b3 = 1.88550639e-8;
-  //Water
-  //b0 = -2.28339315e-8;
-  //b1 = 1.62120188e-6;
-  //b2 = -2.79190159e-7;
-  //b3 = 1.74777231e-8;
-  //Iron
-  //b0 = 4.52433708e-7;
-  //b1 = 3.43437339e-6;
-  //b2 = -5.00105774e-7;
-  //b3 = 2.53501171e-8;
-  //printf("ALLM \n");
+    if (lyr==1){//Rock
+      b0 = 9.34342970e-8;
+      b1 = 2.00377195e-6;  
+      b2 = -3.23502813e-7;
+      b3 = 1.88550639e-8;
+      //printf("Rock \n");
+    }
+    if(lyr==2){//Water
+      b0 = -2.28339315e-8;
+      b1 = 1.62120188e-6;
+      b2 = -2.79190159e-7;
+      b3 = 1.74777231e-8;
+      //printf("Water \n");
+    }
+    if(lyr==0){//Iron
+      b0 = 4.52433708e-7;
+      b1 = 3.43437339e-6;
+      b2 = -5.00105774e-7;
+      b3 = 2.53501171e-8;
+      //printf("Iron \n");
+    }
+    //printf("ALLM \n");
   }
   double log10E = log10(x[0]);
   f = b0+b1*log10E+b2*log10E*log10E+b3*log10E*log10E*log10E;
