@@ -53,9 +53,10 @@ double elost(double E, double dens, int ELOSSmode);
 double dPdesdx(double E);	
 
 // -------------------------------------------------
-// Muon neutrino cross sections: CC and NC
-double dsigCC(double l1, int CCmode);	
-double dsigNC(double l1, int CCmode);
+// Muon neutrino cross sections: CC and NC, for 
+// neutrinos and anti-neutrinos
+double dsigCC(double l1, int CCmode, int AntiNu);	
+double dsigNC(double l1, int CCmode, int AntiNu);
 
 // -------------------------------------------------
 // Local density as a function of zenith angle
@@ -138,12 +139,15 @@ int main(int argc, char **argv)
   char  muondata[1000];
   char  finalccfile[1000];
   char  finalncfile[1000];
-  
+  char  finalccbarfile[1000];
+  char  finalncbarfile[1000];  
   
   if(argc<=10){
     (void)strcpy(muondata, "./Tables/nu_mu_samples");
     (void)strcpy(finalccfile, "./Tables/final_cteq5_cc_nu.data");
     (void)strcpy(finalncfile, "./Tables/final_cteq5_nc_nu.data");
+    (void)strcpy(finalccbarfile, "./Tables/final_cteq5_cc_nubar.data");
+    (void)strcpy(finalncbarfile, "./Tables/final_cteq5_nc_nubar.data");
   }
   if(argc>10){
     (void)strcpy(muondata,     argv[10]);
@@ -152,19 +156,27 @@ int main(int argc, char **argv)
     (void)strcat(muondata, "/Tables/nu_mu_samples");
     (void)strcat(finalccfile, "/Tables/final_cteq5_cc_nu.data");
     (void)strcat(finalncfile, "/Tables/final_cteq5_nc_nu.data");
+    (void)strcpy(finalccbarfile, "./Tables/final_cteq5_cc_nubar.data");
+    (void)strcpy(finalncbarfile, "./Tables/final_cteq5_nc_nubar.data");
   }
   cout << "\nTable File Names:" << endl;
   cout << "muondata     " << muondata << endl;
   cout << "finalccfile " << finalccfile << endl;
-  cout << "finalncfile " << finalncfile << endl << endl;
+  cout << "finalncfile " << finalncfile << endl;
+  cout << "finalccbarfile " << finalccbarfile << endl;
+  cout << "finalncbarfile " << finalncbarfile << endl << endl;
   
   int InitMuon = MuonData.InitTable(muondata);
   FinalTable *CCFinalData = new FinalTable;
   FinalTable *NCFinalData = new FinalTable;
+  FinalTable *CCBarFinalData = new FinalTable;
+  FinalTable *NCBarFinalData = new FinalTable;
   
   CCFinalData->InitTable(finalccfile);
   NCFinalData->InitTable(finalncfile);
-  
+  CCBarFinalData->InitTable(finalccbarfile);
+  NCBarFinalData->InitTable(finalncbarfile);  
+
   cout << "Muon Data Table Initialized: " << InitMuon << endl << endl;
   bool useEnergyDistribution = false;
   if (atof(argv[1]) == 0) {
@@ -187,7 +199,7 @@ int main(int argc, char **argv)
   // Cut in energy below which particles are no longer propagated
   double Elim_eV=1.e9;       // eV
   double Elim=Elim_eV*1.e-9;  // GeV
-  
+
   //-------------------------------------------------
   // Declare several variables
   double rndm;           // random number throughout the code
@@ -203,7 +215,9 @@ int main(int argc, char **argv)
   
   int brkcnt=0, brkcnt2=0; // These are used to flag particles that have fallen below the energy threshold (Elim)
   int prop_mode=0;	  // Used in muon propagation
-  
+
+  int AntiNu=0;           // Switches between neutrino and anti-neutrino during the simulation. 
+ 
   double finalstatecc[2],finalstatenc[2]; // will contain Bjorken (1-y) and y
   
   float dens; // local density along trajectory
@@ -337,6 +351,10 @@ int main(int argc, char **argv)
   if (useEnergyDistribution)
   Energy_GeV =  pow(10,6 + (6 * (double)rand()/RAND_MAX));
   //    cout << Energy_GeV << endl;
+
+  // Randomly determine if this is a neutrino or anti-neutrion with 50/50 distribution.
+  AntiNu = rand()%2;
+  //cout << "AntiNu " << AntiNu << endl;
   
   // Initialize event info
   event.nevt = i;            // event number
@@ -379,7 +397,7 @@ int main(int argc, char **argv)
       double num_int_lens=-log((double) rand() / (double)(RAND_MAX)); // Randomly sampled number of interaction lengths.
       
       // Convert the number of interaction lengths to grammage.
-      double X_int = num_int_lens /(Navo*(dsigCC(Energy_GeV, CCmode)+dsigNC(Energy_GeV, CCmode)));
+      double X_int = num_int_lens /(Navo*(dsigCC(Energy_GeV, CCmode, AntiNu)+dsigNC(Energy_GeV, CCmode, AntiNu)));
       
       // The following lines use the grammage_distance lookup table to estimate what position along the trajectory this Xint corresponds to.
       
@@ -415,7 +433,7 @@ int main(int argc, char **argv)
       if(Ldist < Lmax)
         {
         // Check if it is CC or NC interaction
-        if(((double) rand() / (double)(RAND_MAX))>=dsigNC(Energy_GeV, CCmode)/(dsigNC(Energy_GeV, CCmode)+dsigCC(Energy_GeV, CCmode)))
+        if(((double) rand() / (double)(RAND_MAX))>=dsigNC(Energy_GeV, CCmode, AntiNu)/(dsigNC(Energy_GeV, CCmode, AntiNu)+dsigCC(Energy_GeV, CCmode, AntiNu)))
           {
           //=======================
           // CC interaction occurs (the tracked particle changes from muon neutrino to muon lepton.)
@@ -426,7 +444,12 @@ int main(int argc, char **argv)
           event.v2[npart]=Ldist;
           
           // Obtain Bjorken y
-          CCFinalData->ThrowFinal(log10(Energy_GeV),finalstatecc);
+          if(AntiNu==0){
+          	CCFinalData->ThrowFinal(log10(Energy_GeV),finalstatecc);
+          }
+	  if(AntiNu==1){
+                CCBarFinalData->ThrowFinal(log10(Energy_GeV),finalstatecc);
+          }
           Bjorken_y=finalstatecc[1];
           
           // Set the muon lepton energy from the sampled Bjorken y.
@@ -461,7 +484,12 @@ int main(int argc, char **argv)
           event.v2[npart]=Ldist;
           
           // Obtain Bjorken y
-          NCFinalData->ThrowFinal(log10(Energy_GeV),finalstatenc);
+          if(AntiNu==0){
+          	NCFinalData->ThrowFinal(log10(Energy_GeV),finalstatenc);
+	  }
+          if(AntiNu==1){
+                NCBarFinalData->ThrowFinal(log10(Energy_GeV),finalstatenc);
+          }
           Bjorken_y=finalstatenc[1];
           
           // Set the neutrino energy from the sampled Bjorken y.
@@ -639,10 +667,28 @@ int main(int argc, char **argv)
 // ########################################################
 // CC neutrino cross-section (cm2) - various models fitted
 // ########################################################
-double dsigCC(double E, int CCmode)
+double dsigCC(double E, int CCmode, int AntiNu)
 {
   double f=0.;
   double p[4];
+
+  // The value below determines when we switch from the parameterizations 
+  // of the neutrino cross sections at ultra-high energis (e.g. CTTW standard values) 
+  // to the cross sections to the Ghandi parameterization. These transitions were determined
+  // using the parameterization made for this code. They are likely a bit different if the user 
+  // switches the cross section to the upper or lower cross section models. 
+
+  double E_switch = 2.00e6;  // GeV
+
+  // If the energy is below E_sigma_switch, set CCmode to the Ghandi cross-section.
+  // If the particle is a neutrino, AntiNu = 0 and the cross-section is set to the
+  // the Ghandi model for neutrinos. If it is an anti-neutrino, AntiNu=1 and the
+  // cross-section is set to the Ghdni model for anti-neutrinos.
+
+  if( E < E_switch ){
+  CCmode = 3 + AntiNu;
+  } 
+
   // Connolly+, 2011 lower model (ARW's parametrization)
   double p0[4] = {-4.26355014e+01,   4.89151126e-01,   2.94975025e-02,  -1.32969832e-03};
   // Connolly+, 2011 middle model (ARW's parametrization)
@@ -682,10 +728,28 @@ double dsigCC(double E, int CCmode)
 // ########################################################
 // NC neutrino cross-section (cm2) - various models fitted
 // ########################################################
-double dsigNC(double E, int CCmode)
+double dsigNC(double E, int CCmode, int AntiNu)
 {
   double f=0.;
   double p[4];
+
+  // The value below determines when we switch from the parameterizations 
+  // of the neutrino cross sections at ultra-high energis (e.g. CTTW standard values) 
+  // to the cross sections to the Ghandi parameterization. These transitions were determined
+  // using the parameterization made for this code. They are likely a bit different if the user 
+  // switches the cross section to the upper or lower cross section models. 
+ 
+  double E_switch = 2.00e6;  // GeV
+
+  // If the energy is below E_sigma_switch, set CCmode to the Ghandi cross-section.
+  // If the particle is a neutrino, AntiNu = 0 and the cross-section is set to the
+  // the Ghandi model for neutrinos. If it is an anti-neutrino, AntiNu=1 and the
+  // cross-section is set to the Ghdni model for anti-neutrinos.
+
+  if( E < E_switch ){
+  CCmode = 3 + AntiNu;
+  }
+
   // Connolly+, 2011 lower model (ARW's parametrization)
   double p0[4] = {-4.42377028e+01, 7.07758518e-01, 1.55925146e-02, -1.02484763e-03};
   // Connolly+, 2011 middle model (ARW's parametrization)
