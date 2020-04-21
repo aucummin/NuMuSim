@@ -197,7 +197,7 @@ int main(int argc, char **argv)
   //}
   
   // Cut in energy below which particles are no longer propagated
-  double Elim_eV=1.e9;       // eV
+  double Elim_eV=1.e10;       // eV
   double Elim=Elim_eV*1.e-9;  // GeV
 
   //-------------------------------------------------
